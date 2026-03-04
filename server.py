@@ -15,8 +15,13 @@ POSITIONS_FILE = Path(__file__).parent / "positions.json"
 
 
 def _load_positions() -> dict:
-    with open(POSITIONS_FILE) as f:
-        return json.load(f)
+    try:
+        with open(POSITIONS_FILE) as f:
+            return json.load(f)
+    except FileNotFoundError:
+        return {"positions": []}
+    except json.JSONDecodeError as e:
+        raise ValueError(f"positions.json is malformed: {e}") from e
 
 
 def _fetch_price(ticker: str) -> dict | None:
@@ -61,7 +66,7 @@ def get_prices(tickers: list[str] | None = None) -> str:
     """
     if tickers is None:
         config = _load_positions()
-        tickers = list({p["ticker"] for p in config["positions"] if p["status"] == "active"})
+        tickers = list(dict.fromkeys(p["ticker"] for p in config["positions"] if p["status"] == "active"))
 
     results = []
     for t in tickers:
@@ -83,7 +88,7 @@ def generate_report() -> str:
     """
     config = _load_positions()
     active = [p for p in config["positions"] if p["status"] == "active"]
-    tickers = list({p["ticker"] for p in active})
+    tickers = list(dict.fromkeys(p["ticker"] for p in active))
 
     # Fetch all prices
     prices = {t: _fetch_price(t) for t in tickers}
@@ -122,7 +127,7 @@ def generate_report() -> str:
             else:
                 lines.append(f"   Stock | Range: {pos.get('value_range', 'unknown')}")
 
-        if "alerts" in pos:
+        if "alerts" in pos and price_data:
             up = pos["alerts"].get("upside_target")
             dn = pos["alerts"].get("support_level")
             if up and current >= up:
@@ -133,6 +138,8 @@ def generate_report() -> str:
                 alerts_triggered.append(f"{ticker} ≤ ${dn}")
             else:
                 lines.append(f"   🟢 Normal  ↑${up}  ↓${dn}")
+        elif "alerts" in pos:
+            lines.append(f"   ⚠️ Price unavailable — alerts skipped")
 
         if "notes" in pos:
             lines.append(f"   💡 {pos['notes']}")
@@ -193,23 +200,31 @@ def get_position(ticker: str) -> str:
 @mcp.tool()
 def check_filings() -> str:
     """
-    Check CapitolTrades for recent Nancy Pelosi PTR filings (last 30 days).
-    Returns a summary of any new disclosed trades.
+    Check House Clerk PTR database for recent Nancy Pelosi filings.
+    Queries the public eFD API and returns any trades disclosed in the last 30 days.
+    Note: STOCK Act allows up to 45-day disclosure delay.
     """
-    url = "https://www.capitoltrades.com/politicians/P000197"
-    headers = {"User-Agent": "Mozilla/5.0"}
+    url = "https://efts.house.gov/LATEST/search-index?q=%22Nancy+Pelosi%22&dateRange=custom&fromDate={from_date}&toDate={to_date}&type=ptr"
+    from datetime import timedelta
+    to_date = date.today().strftime("%Y-%m-%d")
+    from_date = (date.today() - timedelta(days=30)).strftime("%Y-%m-%d")
+    query_url = f"https://efts.house.gov/LATEST/search-index?q=%22Nancy+Pelosi%22&dateRange=custom&fromDate={from_date}&toDate={to_date}&type=ptr"
+    headers = {"User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64)"}
     try:
-        r = requests.get(url, headers=headers, timeout=10)
-        if r.status_code == 200:
-            return (
-                "CapitolTrades page fetched. "
-                "For automated parsing, integrate with CapitolTrades API or scrape the trades table.\n"
-                f"URL: {url}\n"
-                f"Status: {r.status_code} — manual review recommended."
-            )
-        return f"CapitolTrades returned HTTP {r.status_code}"
+        r = requests.get(query_url, headers=headers, timeout=10)
+        if r.status_code != 200:
+            return f"House eFD returned HTTP {r.status_code}"
+        data = r.json()
+        hits = data.get("hits", {}).get("hits", [])
+        if not hits:
+            return f"No new PTR filings found for Nancy Pelosi between {from_date} and {to_date}."
+        lines = [f"📋 PTR Filings ({from_date} → {to_date})", "-" * 40]
+        for h in hits:
+            src = h.get("_source", {})
+            lines.append(f"• {src.get('filing_date', 'N/A')}  {src.get('document_type', '')}  {src.get('pdf_url', '')}")
+        return "\n".join(lines)
     except Exception as e:
-        return f"Could not reach CapitolTrades: {e}"
+        return f"Could not reach House eFD: {e}"
 
 
 if __name__ == "__main__":

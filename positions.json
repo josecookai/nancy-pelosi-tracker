@@ -17,7 +17,7 @@
       "id": "nvda-call-jan2027",
       "ticker": "NVDA",
       "type": "call_option",
-      "strike": 800,
+      "strike": 65,
       "expiry": "2027-01-15",
       "disclosed_date": "2026-01-23",
       "status": "active",
