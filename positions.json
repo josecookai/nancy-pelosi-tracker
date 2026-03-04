@@ -1,0 +1,68 @@
+{
+  "politician": "Nancy Pelosi",
+  "last_updated": "2026-03-04",
+  "positions": [
+    {
+      "id": "amzn-call-jan2027",
+      "ticker": "AMZN",
+      "type": "call_option",
+      "strike": 120,
+      "expiry": "2027-01-15",
+      "disclosed_date": "2026-02-18",
+      "status": "active",
+      "alerts": { "upside_target": 240, "support_level": 190 },
+      "notes": "Deep ITM call, AI/AWS thesis"
+    },
+    {
+      "id": "nvda-call-jan2027",
+      "ticker": "NVDA",
+      "type": "call_option",
+      "strike": 800,
+      "expiry": "2027-01-15",
+      "disclosed_date": "2026-01-23",
+      "status": "active",
+      "alerts": { "upside_target": 220, "support_level": 150 },
+      "notes": "AI/semiconductor play"
+    },
+    {
+      "id": "googl-call-jan2027",
+      "ticker": "GOOGL",
+      "type": "call_option",
+      "strike": 150,
+      "expiry": "2027-01-15",
+      "disclosed_date": "2026-01-23",
+      "status": "active",
+      "alerts": { "upside_target": 350, "support_level": 250 },
+      "notes": "Search/AI cloud growth"
+    },
+    {
+      "id": "ab-stock",
+      "ticker": "AB",
+      "type": "stock",
+      "quantity": 25000,
+      "value_range": "1M-5M",
+      "disclosed_date": "2026-01-23",
+      "status": "active",
+      "alerts": { "upside_target": 45, "support_level": 28 },
+      "notes": "Asset management, defensive"
+    },
+    {
+      "id": "vst-stock",
+      "ticker": "VST",
+      "type": "stock",
+      "disclosed_date": "2026-01-23",
+      "status": "active",
+      "alerts": { "upside_target": 220, "support_level": 150 },
+      "notes": "Power generation, AI data center demand"
+    },
+    {
+      "id": "tem-stock",
+      "ticker": "TEM",
+      "type": "stock",
+      "disclosed_date": "2026-01-23",
+      "status": "active",
+      "alerts": { "upside_target": 60, "support_level": 32 },
+      "notes": "Healthcare AI/data analytics"
+    }
+  ]
+}
