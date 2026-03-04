@@ -1,0 +1,88 @@
+#!/bin/bash
+#
+# Nancy Pelosi Tracker - Main entry point
+#
+
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+CONFIG_FILE="${SCRIPT_DIR}/../config/positions.json"
+
+case "$1" in
+    report)
+        # Fetch latest prices and generate report
+        echo "Fetching latest prices..."
+        python3 "${SCRIPT_DIR}/fetch-prices.py" --config "$CONFIG_FILE" --update
+        
+        echo "Generating report..."
+        if [[ "$2" == "--format" && "$3" == "markdown" ]]; then
+            REPORT=$(python3 "${SCRIPT_DIR}/generate-report.py" --config "$CONFIG_FILE" --format markdown)
+        else
+            REPORT=$(python3 "${SCRIPT_DIR}/generate-report.py" --config "$CONFIG_FILE")
+        fi
+        
+        # Send to Telegram if requested
+        if [[ "$*" == *"--notify telegram"* ]]; then
+            echo "Sending to Telegram..."
+            python3 "${SCRIPT_DIR}/notify-telegram.py" --message "$REPORT"
+        fi
+        
+        echo "$REPORT"
+        ;;
+        
+    check-filings)
+        python3 "${SCRIPT_DIR}/check-filings.py"
+        ;;
+        
+    refresh)
+        python3 "${SCRIPT_DIR}/fetch-prices.py" --config "$CONFIG_FILE" --update
+        ;;
+        
+    position)
+        # Show specific position
+        if [[ -z "$2" ]]; then
+            echo "Usage: $0 position <TICKER>"
+            exit 1
+        fi
+        python3 -c "
+import json
+import sys
+with open('$CONFIG_FILE') as f:
+    config = json.load(f)
+for p in config['positions']:
+    if p['ticker'] == '$2':
+        print(json.dumps(p, indent=2))
+        sys.exit(0)
+print(f'Position {sys.argv[1]} not found')
+"
+        ;;
+        
+    help|--help|-h)
+        cat << 'EOF'
+Nancy Pelosi Tracker - Congressional Trading Monitor
+
+Usage: pelosi-tracker <command> [options]
+
+Commands:
+    report              Generate portfolio report
+        --format markdown   Use markdown format
+        --notify telegram   Send to Telegram
+    
+    check-filings       Check for new PTR filings
+    refresh             Update price data only
+    position <TICKER>   Show specific position details
+    help                Show this help message
+
+Examples:
+    pelosi-tracker report
+    pelosi-tracker report --format markdown --notify telegram
+    pelosi-tracker position AMZN
+    pelosi-tracker refresh
+
+EOF
+        ;;
+        
+    *)
+        echo "Unknown command: $1"
+        echo "Use '$0 help' for usage information"
+        exit 1
+        ;;
+esac

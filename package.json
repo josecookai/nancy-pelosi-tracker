@@ -1,0 +1,29 @@
+{
+  "name": "nancy-pelosi-tracker",
+  "version": "1.0.0",
+  "description": "Automated tracking and reporting system for Nancy Pelosi's congressional stock trading disclosures",
+  "main": "scripts/pelosi-tracker",
+  "scripts": {
+    "report": "./scripts/pelosi-tracker report",
+    "refresh": "./scripts/pelosi-tracker refresh",
+    "check": "./scripts/pelosi-tracker check-filings"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/josecookai/nancy-pelosi-tracker.git"
+  },
+  "keywords": [
+    "congress",
+    "stock-trading",
+    "nancy-pelosi",
+    "politician-tracking",
+    "ptr",
+    "disclosure"
+  ],
+  "author": "Smrti Lab",
+  "license": "MIT",
+  "dependencies": {
+    "python": ">=3.8",
+    "requests": ">=2.25.0"
+  }
+}
