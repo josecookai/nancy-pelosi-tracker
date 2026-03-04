@@ -1,12 +1,18 @@
 # 🏛️ Nancy Pelosi Tracker
 
 > Automated tracking and reporting system for Nancy Pelosi's congressional stock trading disclosures
+> 
+> **🤖 Now compatible with OpenClaw Skill & Claude Code Skill**
 
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
+[![OpenClaw](https://img.shields.io/badge/OpenClaw-Skill-blue)](https://clawd.bot)
+[![Claude Code](https://img.shields.io/badge/Claude%20Code-Skill-green)](https://claude.ai)
 
 ## 📋 Overview
 
 This tool automatically tracks Nancy Pelosi's disclosed stock positions, monitors real-time prices, calculates option valuations, and generates daily reports. It provides transparency into congressional trading activity as required by the STOCK Act.
+
+**Dual Skill Support**: This repository works as both an **OpenClaw Skill** and a **Claude Code Skill**, allowing seamless integration with both AI agent platforms.
 
 ## ✨ Features
 
@@ -37,13 +43,69 @@ cd nancy-pelosi-tracker
 ./scripts/pelosi-tracker check-filings
 ```
 
+## 🤖 Skill Integration
+
+### OpenClaw Skill
+
+Install as an OpenClaw skill to enable natural language commands:
+
+```bash
+# Install skill
+clawdhub install nancy-pelosi-tracker
+
+# Use via OpenClaw
+clawd nancy-pelosi-tracker report
+clawd nancy-pelosi-tracker position AMZN
+clawd nancy-pelosi-tracker check-filings --alert-on-new
+```
+
+**OpenClaw Commands:**
+- `Generate Pelosi portfolio report` → Auto-detects and runs tracker
+- `Check for new Pelosi trades` → Checks CapitolTrades API
+- `What's the status of AMZN position?` → Shows position details
+- `Set alert for NVDA at $200` → Configures price alert
+
+### Claude Code Skill
+
+Use with Claude Code for advanced analysis and development:
+
+```bash
+# In Claude Code workspace
+/claude nancy-pelosi-tracker analyze
+/claude nancy-pelosi-tracker backtest --days 90
+/claude nancy-pelosi-tracker extend --politician "Josh Gottheimer"
+```
+
+**Claude Code Features:**
+- **Code Analysis**: Review and improve tracker logic
+- **API Integration**: Implement new data sources
+- **Architecture**: Refactor for multi-politician support
+- **Dashboard**: Build web visualization
+- **Backtesting**: Historical performance analysis
+
+### Skill Development Mode
+
+Both platforms can collaborate on development:
+
+```bash
+# Codex handles API integrations
+@codex Implement CapitolTrades API connection per ROADMAP.md 2.1
+
+# Claude Code handles architecture
+@claude-code Refactor database schema for multi-politician support
+```
+
+See [ROADMAP.md](ROADMAP.md) for detailed task assignments.
+
 ## 📁 Project Structure
 
 ```
 nancy-pelosi-tracker/
-├── SKILL.md                    # Skill documentation
-├── package.json                # Project metadata
+├── SKILL.md                    # OpenClaw skill documentation
 ├── README.md                   # This file
+├── ROADMAP.md                  # Development roadmap (Phase 2-3)
+├── package.json                # Project metadata
+├── .clawdhublink               # OpenClaw Hub registration
 ├── config/
 │   └── positions.json          # Tracked positions database
 ├── scripts/
@@ -149,18 +211,55 @@ Edit `config/positions.json` to customize:
 
 ## 🗺️ Roadmap
 
+See [ROADMAP.md](ROADMAP.md) for detailed Phase 2-3 specifications.
+
+### Phase 1: MVP ✅ (Completed)
 - [x] Core tracking and reporting
 - [x] Telegram notifications
 - [x] Option valuation calculations
-- [ ] Web dashboard
-- [ ] CapitolTrades API integration
-- [ ] Automatic new filing detection
+- [x] OpenClaw Skill support
+- [x] Claude Code Skill support
+
+### Phase 2: Automation 🚧 (In Progress)
+- [ ] CapitolTrades API integration → **@codex**
+- [ ] Real-time price alert system → **@claude-code**
+- [ ] Web dashboard → **@codex**
+- [ ] Multi-politician support → **@claude-code**
+
+### Phase 3: Scale 📊 (Planned)
 - [ ] Historical performance backtesting
-- [ ] Expand to other Congress members (congress-trading-tracker)
+- [ ] Predictive analytics
+- [ ] Mobile app
+- [ ] Community contributions
+
+**Development Approach**: Phase 2-3 tasks are split between **Codex** (API/Full-stack) and **Claude Code** (Real-time systems/Architecture) for parallel development. See ROADMAP.md for task assignments.
 
 ## 🤝 Contributing
 
 Contributions welcome! Please open an issue or PR.
+
+### Dual Skill Development Workflow
+
+This project uses both OpenClaw and Claude Code for parallel development:
+
+1. **Feature Request** → Create GitHub issue
+2. **Task Assignment** → Assign to @codex or @claude-code per ROADMAP.md
+3. **Development** → Agent implements feature in their branch
+4. **Code Review** → Other agent reviews PR
+5. **Integration** → Merge to main, update both skill registries
+
+**Example Workflow:**
+```bash
+# Assign API integration to Codex
+gh issue create --title "Integrate CapitolTrades API" \
+  --assignee "@codex" \
+  --label "enhancement,api"
+
+# Assign alert system to Claude Code  
+gh issue create --title "Build price alert system" \
+  --assignee "@claude-code" \
+  --label "enhancement,real-time"
+```
 
 ## 📄 License
 
